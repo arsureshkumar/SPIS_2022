@@ -5,4 +5,13 @@ import pandas as pd
 
 data = pd.read_csv("data/OnionOrNot.csv")
 
+tokens = Tokenizer()
+# fit the tokenizer on the documents
+tokens.fit_on_texts(data.text)
+# summarize what was learned
+print(tokens.word_counts)
+print(tokens.document_count)
+print(tokens.word_index)
+print(tokens.word_docs)
+
 print(data)
