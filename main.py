@@ -6,12 +6,17 @@ import pandas as pd
 data = pd.read_csv("data/OnionOrNot.csv")
 
 tokens = Tokenizer()
-# fit the tokenizer on the documents
 tokens.fit_on_texts(data.text)
-# summarize what was learned
-print(tokens.word_counts)
-print(tokens.document_count)
-print(tokens.word_index)
-print(tokens.word_docs)
+#print(tokens.word_counts)
+#print(tokens.word_index)
 
+def remove_high_freq(l, thresh):
+    return([i for i in l if i > thresh])
+
+
+
+data.text = tokens.texts_to_sequences(data.text)
+data.text = data.text.map(lambda x: remove_high_freq(x, 100))
+
+print(len(tokens.word_index))
 print(data)
