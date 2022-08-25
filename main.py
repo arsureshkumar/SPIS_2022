@@ -1,6 +1,6 @@
 from keras.preprocessing.text import Tokenizer
 from keras.models import Sequential
-from keras.layers import Dense, Flatten, Embedding
+from keras.layers import Dense, Flatten, Embedding, Conv1D
 import pandas as pd
 
 data = pd.read_csv("data/OnionOrNot.csv")
@@ -25,12 +25,11 @@ vocabulary -= 3000
 
 model = Sequential()
 model.add(Embedding(vocabulary, 32))
-model.add(Flatten())
+model.add(Conv1D(filters=32, kernel_size=8, activation='relu'))
+#model.add(Flatten())
 model.add(Dense(10, activation='relu'))
 model.add(Dense(1, activation='sigmoid'))
 
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-
-model.
 
 print(data)
