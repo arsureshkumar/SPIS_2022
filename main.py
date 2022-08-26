@@ -11,12 +11,13 @@ tokens = Tokenizer()
 tokens.fit_on_texts(data.text)
 
 def remove_high_freq(l, thresh):
-    return([i for i in l if i > thresh])
+    return([i - thresh if i > thresh else 0 for i in l ])
 
 def remove_low_freq(l, thresh):
     return([i for i in l if i < thresh])
 
 vocabulary = len(tokens.word_index)
+print(vocabulary)
 
 data.text = tokens.texts_to_sequences(data.text)
 data.text = data.text.map(lambda x: remove_high_freq(x, 100))
@@ -29,19 +30,16 @@ def add_zeroes(l):
     return(l)
 data.text = data.text.map(add_zeroes)
 
-x = list(data.text)
-y = list(data.label)
 
-x = np.asarray(x).astype('float32')
-y = np.asarray(y).astype('float32')
-print(x)
+x = np.asarray(list(data.text)).astype('float32')
+y = np.asarray(list(data.label)).astype('float32')
+
 X_train, X_test, y_train, y_test = train_test_split(x, y, test_size = 0.2)
 X_train, X_val,  y_train, y_val = train_test_split(X_train, y_train, test_size = 0.2)
 
 print(X_train)
 
-vocabulary -= 100
-vocabulary -= 3000
+
 
 model = Sequential()
 model.add(Embedding(vocabulary, 32))
