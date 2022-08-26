@@ -1,9 +1,8 @@
 from keras.preprocessing.text import Tokenizer
 from keras.models import Sequential
-from keras.layers import Dense, Embedding, Conv1D
+from keras.layers import Dense, Flatten, Embedding, Conv1D
 import pandas as pd
 from sklearn.model_selection import train_test_split
-import numpy as np
 
 data = pd.read_csv("data/OnionOrNot.csv")
 
@@ -11,35 +10,26 @@ tokens = Tokenizer()
 tokens.fit_on_texts(data.text)
 
 def remove_high_freq(l, thresh):
-    return([i - thresh if i > thresh else 0 for i in l ])
+    return([i for i in l if i > thresh])
 
 def remove_low_freq(l, thresh):
     return([i for i in l if i < thresh])
 
 vocabulary = len(tokens.word_index)
-print(vocabulary)
 
 data.text = tokens.texts_to_sequences(data.text)
 data.text = data.text.map(lambda x: remove_high_freq(x, 100))
 data.text = data.text.map(lambda x: remove_low_freq(x, vocabulary-3000))
 
-maximum_length = len(max(data.text, key=len))
-def add_zeroes(l):
-    while len(l) < maximum_length:
-        l.append(0)
-    return(l)
-data.text = data.text.map(add_zeroes)
 
 
-x = np.asarray(list(data.text)).astype('float32')
-y = np.asarray(list(data.label)).astype('float32')
-
-X_train, X_test, y_train, y_test = train_test_split(x, y, test_size = 0.2)
+X_train, X_test, y_train, y_test = train_test_split(data.text, data.label, test_size = 0.2)
 X_train, X_val,  y_train, y_val = train_test_split(X_train, y_train, test_size = 0.2)
 
 print(X_train)
 
-
+vocabulary -= 100
+vocabulary -= 3000
 
 model = Sequential()
 model.add(Embedding(vocabulary, 32))
@@ -49,7 +39,9 @@ model.add(Dense(1, activation='relu'))
 
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
-model.fit(X_train, y_train, batch_size = 32, epochs = 2)
+model.fit(X_train, y_train, batch_size = 32, epochs = 2, validation_data = (X_val, y_val))
 
-results = model.evaluate(X_test, y_test, batch_size=128, validation_data = (X_val, y_val))
+results = model.evaluate(X_test, y_test, batch_size=128)
 print("test loss, test acc:", results)
+
+print("hello")
