@@ -53,3 +53,5 @@ model.fit(X_train, y_train, batch_size = 32, epochs = 2)
 
 results = model.evaluate(X_test, y_test, batch_size=128, validation_data = (X_val, y_val))
 print("test loss, test acc:", results)
+
+print("hello")
