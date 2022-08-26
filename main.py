@@ -49,7 +49,7 @@ model.add(Dense(1, activation='relu'))
 
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
-model.fit(X_train, y_train, batch_size = 32, epochs = 2)
+model.fit(X_train, y_train, batch_size = 32, epochs = 2, validation_data = (X_val, y_val))
 
-results = model.evaluate(X_test, y_test, batch_size=128, validation_data = (X_val, y_val))
+results = model.evaluate(X_test, y_test, batch_size=128)
 print("test loss, test acc:", results)
