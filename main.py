@@ -1,8 +1,9 @@
 from keras.preprocessing.text import Tokenizer
 from keras.models import Sequential
-from keras.layers import Dense, Flatten, Embedding, Conv1D
+from keras.layers import Dense, Embedding, Conv1D
 import pandas as pd
 from sklearn.model_selection import train_test_split
+import numpy as np
 
 data = pd.read_csv("data/OnionOrNot.csv")
 
@@ -21,7 +22,20 @@ data.text = tokens.texts_to_sequences(data.text)
 data.text = data.text.map(lambda x: remove_high_freq(x, 100))
 data.text = data.text.map(lambda x: remove_low_freq(x, vocabulary-3000))
 
-X_train, X_test, y_train, y_test = train_test_split(data.text, data.label, test_size = 0.2)
+maximum_length = len(max(data.text, key=len))
+def add_zeroes(l):
+    while len(l) < maximum_length:
+        l.append(0)
+    return(l)
+data.text = data.text.map(add_zeroes)
+
+x = list(data.text)
+y = list(data.label)
+
+x = np.asarray(x).astype('float32')
+y = np.asarray(y).astype('float32')
+print(x)
+X_train, X_test, y_train, y_test = train_test_split(x, y, test_size = 0.2)
 X_train, X_val,  y_train, y_val = train_test_split(X_train, y_train, test_size = 0.2)
 
 print(X_train)
@@ -37,7 +51,7 @@ model.add(Dense(1, activation='relu'))
 
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
-model.fit(X_train, y_train, batch_size = 32, epochs = 2, validation_data = (X_val, y_val))
+model.fit(X_train, y_train, batch_size = 32, epochs = 2)
 
-results = model.evaluate(X_test, y_test, batch_size=128)
+results = model.evaluate(X_test, y_test, batch_size=128, validation_data = (X_val, y_val))
 print("test loss, test acc:", results)
