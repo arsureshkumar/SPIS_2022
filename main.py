@@ -5,7 +5,25 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 import numpy as np
 
-data = pd.read_csv("data/OnionOrNot.csv")
+#data = pd.read_csv("data/OnionOrNot.csv")
+tdata = pd.read_csv("data/True.csv") #True data
+fdata = pd.read_csv("data/Fake.csv") #False data
+
+tdata["text"] = tdata["title"].astype(str) + " " + tdata["body"]
+tdata["label"] = "0"
+tdata.pop('subject')
+tdata.pop('title')
+tdata.pop('body')
+
+fdata["text"] = fdata["title"].astype(str) + " " + fdata["body"]
+fdata["label"] = "1"
+fdata.pop('subject')
+fdata.pop('title')
+fdata.pop('body')
+
+datalist = [tdata, fdata]
+data = pd.concat(datalist)
+data = data.sample(frac=1)
 
 tokens = Tokenizer()
 tokens.fit_on_texts(data.text)
@@ -20,8 +38,8 @@ vocabulary = len(tokens.word_index)
 print(vocabulary)
 
 data.text = tokens.texts_to_sequences(data.text)
-data.text = data.text.map(lambda x: remove_high_freq(x, 100))
-data.text = data.text.map(lambda x: remove_low_freq(x, vocabulary-3000))
+data.text = data.text.map(lambda x: remove_high_freq(x, 1000))
+data.text = data.text.map(lambda x: remove_low_freq(x, vocabulary-30000))
 
 maximum_length = len(max(data.text, key=len))
 def add_zeroes(l):
