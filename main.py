@@ -5,12 +5,13 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 import numpy as np
 
-data = pd.read_csv("data/OnionOrNot.csv")
+#data = pd.read_csv("data/OnionOrNot.csv")
+#First Dataset, to use un-comment line 8 and comment lines 30-33
+
 
 #Convert True and False datasets to pandas, modify, then combine
 tdata = pd.read_csv("data/True.csv") #True data
 fdata = pd.read_csv("data/Fake.csv") #False data
-
 
 #tdata["text"] = tdata["title"].astype(str) + " " + tdata["body"]
 tdata["label"] = 0
@@ -25,11 +26,10 @@ fdata["label"] = 1
 #fdata.pop('body')
 
 
-#data = pd.concat([tdata, fdata], ignore_index = True)
-#data = data.sample(frac=1)
+data = pd.concat([tdata, fdata], ignore_index = True)
+data = data.sample(frac=1)
 
-#data["text"] = data["title"].astype(str) + " " + data["body"] #Combination of title and body
-
+data["text"] = data["title"].astype(str) + " " + data["body"] #Combination of title and body
 
 #print(data.text)
 
