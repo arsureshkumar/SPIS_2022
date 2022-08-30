@@ -14,22 +14,22 @@ tdata = pd.read_csv("data/True.csv") #True data
 fdata = pd.read_csv("data/Fake.csv") #False data
 
 #tdata["text"] = tdata["title"].astype(str) + " " + tdata["body"]
-tdata["label"] = 0
+tdata["label"] = 0 #adds label 0 to true data
 #tdata.pop('subject')
 #tdata.pop('title')
 #tdata.pop('body')
 
 #fdata["text"] = fdata["title"].astype(str) + " " + fdata["body"]
-fdata["label"] = 1
+fdata["label"] = 1 #adds label 1 to false data
 #fdata.pop('subject')
 #fdata.pop('title')
 #fdata.pop('body')
 
 
-data = pd.concat([tdata, fdata], ignore_index = True)
-data = data.sample(frac=1)
+data = pd.concat([tdata, fdata], ignore_index = True) #combines true and false datasets into data
+data = data.sample(frac=1) #randomizes data
 
-data["text"] = data["title"].astype(str) + " " + data["body"] #Combination of title and body
+data["text"] = data["title"].astype(str) + " " + data["body"] #Creates text column which is ombination of title and body
 
 #print(data.text)
 
