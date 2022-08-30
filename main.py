@@ -13,25 +13,17 @@ import numpy as np
 tdata = pd.read_csv("data/True.csv") #True data
 fdata = pd.read_csv("data/Fake.csv") #False data
 
-#tdata["text"] = tdata["title"].astype(str) + " " + tdata["body"]
 tdata["label"] = 0 #adds label 0 to true data
-#tdata.pop('subject')
-#tdata.pop('title')
-#tdata.pop('body')
-
-#fdata["text"] = fdata["title"].astype(str) + " " + fdata["body"]
 fdata["label"] = 1 #adds label 1 to false data
-#fdata.pop('subject')
-#fdata.pop('title')
-#fdata.pop('body')
 
+for i in [tdata, fdata]:
+    i["text"] = i["title"].astype(str) + " " + i["body"] #Creates text column which is ombination of title and body
 
-data = pd.concat([tdata, fdata], ignore_index = True) #combines true and false datasets into data
+data = [i.drop(['subject', 'title', 'body'], axis=1) for i in [tdata, fdata]] #drops unecessary data
+
+data = pd.concat(data, ignore_index = True) #combines true and false datasets into data
 data = data.sample(frac=1) #randomizes data
 
-data["text"] = data["title"].astype(str) + " " + data["body"] #Creates text column which is ombination of title and body
-
-#print(data.text)
 
 tokens = Tokenizer()
 tokens.fit_on_texts(data.text)
@@ -46,8 +38,11 @@ vocabulary = len(tokens.word_index)
 print(vocabulary)
 
 data.text = tokens.texts_to_sequences(data.text)
-data.text = data.text.map(lambda x: remove_high_freq(x, 100))
-data.text = data.text.map(lambda x: remove_low_freq(x, vocabulary-3000))
+#data.text = data.text.map(lambda x: remove_high_freq(x, 100))
+#data.text = data.text.map(lambda x: remove_low_freq(x, vocabulary-3000))
+
+print(data)
+
 
 maximum_length = len(max(data.text, key=len))
 def add_zeroes(l):
@@ -63,19 +58,17 @@ y = np.asarray(list(data.label)).astype('float32')
 X_train, X_test, y_train, y_test = train_test_split(x, y, test_size = 0.2)
 X_train, X_val,  y_train, y_val = train_test_split(X_train, y_train, test_size = 0.2)
 
-print(X_train)
-
-
 
 model = Sequential()
-model.add(Embedding(vocabulary, 32))
+model.add(Embedding(vocabulary, 64))
 model.add(Conv1D(filters=32, kernel_size=8, activation='relu'))
+model.add(Conv1D(filters=32, kernel_size=8, activation='relu')) # added another convolutional layer to improve context detection
 model.add(Dense(10, activation='relu'))
 model.add(Dense(1, activation='relu'))
 
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
-model.fit(X_train, y_train, batch_size = 32, epochs = 2, validation_data = (X_val, y_val))
+model.fit(X_train, y_train, batch_size = 32, epochs = 5, validation_data = (X_val, y_val))
 
 results = model.evaluate(X_test, y_test, batch_size=128)
 print("test loss, test acc:", results)
