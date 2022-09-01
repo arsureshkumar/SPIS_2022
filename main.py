@@ -14,12 +14,6 @@ data = data.sample(frac=1) #randomizes data
 tokens = Tokenizer() #tokenizes dataset
 tokens.fit_on_texts(data.text.values)
 
-def remove_high_freq(l, thresh):
-    return([i - thresh if i > thresh else 0 for i in l ])
-
-def remove_low_freq(l, thresh):
-    return([i for i in l if i < thresh])
-
 vocabulary = len(tokens.word_index)
 print(vocabulary)
 
